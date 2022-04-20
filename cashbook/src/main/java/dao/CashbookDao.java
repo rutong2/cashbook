@@ -130,7 +130,7 @@ public class CashbookDao {
 			Class.forName("org.mariadb.jdbc.Driver"); // 드라이브 로딩
 			
 			// 쿼리 작성
-			String sql = "SELECT cash_date cashDate, kind, cash, memo FROM cashbook WHERE cashbook_no=?";
+			String sql = "SELECT cash_date cashDate, kind, cash, memo, create_date createDate, update_date updateDate FROM cashbook WHERE cashbook_no=?";
 			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
 			stmt = conn.prepareStatement(sql); // 쿼리 작성
 			stmt.setInt(1, cashbookNo);
@@ -142,6 +142,8 @@ public class CashbookDao {
 				cashbook.setKind(rs.getString("kind"));
 				cashbook.setCash(rs.getInt("cash"));
 				cashbook.setMemo(rs.getString("memo"));
+				cashbook.setCreateDate(rs.getString("createDate"));
+				cashbook.setUpdateDate(rs.getString("updateDate"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -156,5 +158,52 @@ public class CashbookDao {
 		}
 		
 		return cashbook;
+	}
+	
+	public int deleteCashbook(int cashbookNo) {
+		int row = 0;
+		// 자원 준비
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		PreparedStatement stmt2 = null;
+		
+		try {
+			Class.forName("org.mariadb.jdbc.Driver"); // 드라이브 로딩
+			
+			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
+			conn.setAutoCommit(false); // 자동커밋 X
+			
+			// hashtag테이블이 cashbook을 외래키로 가지고 있으므로 삭제할때는 hashtag의 정보를 삭제 후 cashbook의 정보를 삭제해야 한다
+			// hashtag테이블 삭제 구현
+			String sql = "DELETE FROM hashtag"
+					+ " WHERE cashbook_no=?";
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, cashbookNo);
+			stmt.executeUpdate();
+			
+			// cashbook테이블 삭제 구현
+			String sql2 = "DELETE FROM cashbook"
+					+ " WHERE cashbook_no=?";
+			stmt2 = conn.prepareStatement(sql2); // 쿼리 작성
+			stmt2.setInt(1, cashbookNo);
+			row = stmt2.executeUpdate(); // 삭제 실행
+			
+			conn.commit(); // 커밋 실행
+		} catch (Exception e) {
+			try {
+				conn.rollback(); // 예외가 발생하면 rollback
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return row;
 	}
 }

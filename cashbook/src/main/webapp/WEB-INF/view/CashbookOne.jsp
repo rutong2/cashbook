@@ -10,6 +10,7 @@
 <body>
 	<%
 		Cashbook cashbook = (Cashbook)request.getAttribute("cashbook");
+		int cashbookNo = (Integer)request.getAttribute("cashbookNo");
 	%>
 	<div class="container bg-dark">
 		<h1 class="text-white text-center">입력페이지</h1>
@@ -29,6 +30,22 @@
 			<tr>
 				<td>memo</td>
 				<td><%=cashbook.getMemo()%></td>
+			</tr>
+			<tr>
+				<td>createDate</td>
+				<td><%=cashbook.getCreateDate()%></td>
+			</tr>
+			<tr>
+				<td>updateDate</td>
+				<td><%=cashbook.getUpdateDate()%></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<span class="float-right">
+						<a class="btn btn-primary" href="<%=request.getContextPath()%>/UpdateCashbookController">수정</a>
+						<a class="btn btn-danger" href="<%=request.getContextPath()%>/DeleteCashbookController?cashbookNo=<%=cashbookNo%>">삭제</a>
+					</span>
+				</td>
 			</tr>
 		</table>
 	</div>

@@ -24,6 +24,7 @@ public class CashbookOneController extends HttpServlet {
 		Cashbook cashbook = cashbookDao.selectCashbookOne(cashbookNo); // 메서드 실행 후 저장
 		
 		request.setAttribute("cashbook", cashbook); // CashbookOne.jsp에 값 넘겨주기 위해 저장
+		request.setAttribute("cashbookNo", cashbookNo); // 삭제 수정을 위한 정보의 번호 저장
 		
 		request.getRequestDispatcher("/WEB-INF/view/CashbookOne.jsp").forward(request, response);
 	}
