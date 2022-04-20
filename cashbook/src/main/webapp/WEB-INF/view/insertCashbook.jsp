@@ -1,9 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-	int year = Integer.parseInt(request.getParameter("year"));
-	int month = Integer.parseInt(request.getParameter("month"));
-	int day = Integer.parseInt(request.getParameter("day"));
-%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,11 +12,10 @@
 		<form method="post" action="<%=request.getContextPath()%>/InsertCashbookController">
 			<table class="table table-bordered text-center table-striped table-dark">
 				<tr>
-					<td>
-						<input type="hidden" name="year" value="<%=year%>">
-						<input type="hidden" name="month" value="<%=month%>">
-						<input type="hidden" name="day" value="<%=day%>">
-					</td>
+					<td>날짜</td>
+					<td><input type="text" name="cashDate" value="<%=(String)request.getAttribute("cashDate")%>" readonly="readonly"></td>
+				</tr>
+				<tr>
 					<td colspan="2">
 						<input type="radio" name="kind" value="수입">수입 
 						&nbsp;&nbsp;&nbsp;

@@ -54,8 +54,6 @@ public class CashbookDao {
 		} finally {
 			try {
 				// 자원 반납
-				rs.close();
-				stmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -64,39 +62,56 @@ public class CashbookDao {
 		return list;
 	}
 	
-	public void insertCashbook(Cashbook cashbook) {
+	public void insertCashbook(Cashbook cashbook, List<String> hashtag) {
 		// 자원 준비
 		Connection conn = null;
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		
 		try {
 			Class.forName("org.mariadb.jdbc.Driver"); // 드라이브 로딩
 			
 			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
+			conn.setAutoCommit(false);; // 자동 커밋 해제
+			
 			String sql = "INSERT INTO cashbook"
-					+ "  (cashbook_no, cash_date, kind, cash, memo, update_date, create_date)"
+					+ "  (cash_date, kind, cash, memo, update_date, create_date)"
 					+ "  VALUES"
-					+ "  (?, ?, ?, ?, ?, NOW(), NOW())";
-			stmt = conn.prepareStatement(sql); // 쿼리 작성
-			stmt.setInt(1, cashbook.getCashbookNo());
-			stmt.setString(2, cashbook.getCashDate());
-			stmt.setString(3, cashbook.getKind());
-			stmt.setInt(4, cashbook.getCash());
-			stmt.setString(5, cashbook.getMemo());
+					+ "  (?, ?, ?, ?, NOW(), NOW())";
+			// insert + select 방금 생성된 행의 키값 ex) select 방금 입력한 cashbook_no from cashbook;
+			stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS); // 쿼리 작성
+			stmt.setString(1, cashbook.getCashDate());
+			stmt.setString(2, cashbook.getKind());
+			stmt.setInt(3, cashbook.getCash());
+			stmt.setString(4, cashbook.getMemo());
+			stmt.executeUpdate(); // insert 실행
+			rs = stmt.getGeneratedKeys(); // select 실행 -> insert한 키값 select cashbook_no from cashbook;
+			int cashbookNo = 0;
 			
-			int row = stmt.executeUpdate(); // 입력한 정보 수
-			
-			if(row == 1) {
-				System.out.println("입력 완료");
-			} else {
-				System.out.println("입력 실패");
+			if(rs.next()) {
+				cashbookNo = rs.getInt(1);
+			}
+			// hashtag 테이블에 저장하는 코드
+			PreparedStatement stmt2 = null;
+			for(String h : hashtag) {
+				String sql2 = "INSERT INTO hashtag(cashbook_no, tag, create_date) "
+						+ " VALUES(?, ?, NOW())";
+				stmt2 = conn.prepareStatement(sql2);
+				stmt2.setInt(1, cashbookNo);
+				stmt2.setString(2, h);
+				stmt2.executeUpdate();
 			}
 			
+			conn.commit();
 		} catch (Exception e) {
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		} finally {
 			try {
-				stmt.close();
 				conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
