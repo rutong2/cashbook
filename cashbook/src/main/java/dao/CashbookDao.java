@@ -118,4 +118,43 @@ public class CashbookDao {
 			}
 		}
 	}
+	
+	public Cashbook selectCashbookOne(int cashbookNo) {
+		Cashbook cashbook = null; // 객체 생성 준비
+		// 자원 준비
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			Class.forName("org.mariadb.jdbc.Driver"); // 드라이브 로딩
+			
+			// 쿼리 작성
+			String sql = "SELECT cash_date cashDate, kind, cash, memo FROM cashbook WHERE cashbook_no=?";
+			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
+			stmt = conn.prepareStatement(sql); // 쿼리 작성
+			stmt.setInt(1, cashbookNo);
+			rs = stmt.executeQuery(); // 쿼리 저장
+			
+			while(rs.next()) {
+				cashbook = new Cashbook(); // 객체 생성
+				cashbook.setCashDate(rs.getString("cashDate"));
+				cashbook.setKind(rs.getString("kind"));
+				cashbook.setCash(rs.getInt("cash"));
+				cashbook.setMemo(rs.getString("memo"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				rs.close();
+				stmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return cashbook;
+	}
 }
