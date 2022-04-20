@@ -42,7 +42,7 @@ public class InsertCashbookController extends HttpServlet {
 		
 		request.setAttribute("cashDate", cashDate); // insertCashbook.jsp에 값을 넘겨주기 위해 저장
 		
-		request.getRequestDispatcher("/WEB-INF/view/insertCashbook.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/view/InsertCashbook.jsp").forward(request, response);
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
