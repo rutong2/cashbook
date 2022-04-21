@@ -1,3 +1,4 @@
+	<%@page import="dao.CashbookDao"%>
 <%@page import="vo.Cashbook"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -42,7 +43,7 @@
 			<tr>
 				<td colspan="2">
 					<span class="float-right">
-						<a class="btn btn-primary" href="<%=request.getContextPath()%>/UpdateCashbookController">수정</a>
+						<a class="btn btn-primary" href="<%=request.getContextPath()%>/UpdateCashbookController?cashbookNo=<%=cashbookNo%>&cashDate=<%=cashbook.getCashDate()%>&kind=<%=cashbook.getKind()%>&cash=<%=cashbook.getCash()%>&memo=<%=cashbook.getMemo()%>">수정</a>
 						<a class="btn btn-danger" href="<%=request.getContextPath()%>/DeleteCashbookController?cashbookNo=<%=cashbookNo%>">삭제</a>
 					</span>
 				</td>

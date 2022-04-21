@@ -8,7 +8,6 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 </head>
 <body>
-	<div class="container bg-dark">
 		<%
 			// Map에 저장된 값들 받아오기
 			int startBlank = (Integer)request.getAttribute("startBlank");
@@ -28,6 +27,10 @@
 			System.out.println("CashbookListByMonth.jsp -> year : " + year);
 			System.out.println("CashbookListByMonth.jsp -> month : " + month);
 		%>
+	<div class="container bg-dark">
+		<div>
+			<a href="<%=request.getContextPath()%>/TagController">태그랭킹</a>
+		</div>
 		<h2 class="text-white text-center"><%=year%>년 <%=month%>월</h2>
 		<div>
 			<a href="<%=request.getContextPath()%>/CashbookListByMonthController?year=<%=year%>&month=<%=month-1%>">이전달</a>
