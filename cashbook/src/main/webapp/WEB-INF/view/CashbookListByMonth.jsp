@@ -28,6 +28,11 @@
 			System.out.println("CashbookListByMonth.jsp -> month : " + month);
 		%>
 	<div class="container bg-dark">
+		<div class="float-right">
+			<span class="text-white"><%=session.getAttribute("sessionMemberId")%>님 반갑습니다. |</span>
+			<a class="text-white" href="<%=request.getContextPath()%>/SelectMemberOneController"> 정보수정 </a> <span class="text-white">|</span> 
+			<a class="text-white" href="<%=request.getContextPath()%>/LogoutController"> 로그아웃</a>
+		</div>
 		<div>
 			<a href="<%=request.getContextPath()%>/TagController">태그랭킹</a>
 		</div>

@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.CashbookDao;
 import vo.Cashbook;
@@ -14,6 +15,15 @@ import vo.Cashbook;
 public class CashbookOneController extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		String sessionMemberId = (String)session.getAttribute("sessionMemberId");
+		
+		// 로그인이 안돼있으면 접근 금지
+		if(sessionMemberId == null) {
+			response.sendRedirect(request.getContextPath() + "/LoginController");
+			return;
+		}
+		
 		// 정보 받기
 		int cashbookNo = 0;
 		if(request.getParameter("cashbookNo") != null) {

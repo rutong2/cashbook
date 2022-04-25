@@ -8,12 +8,25 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.CashbookDao;
 
 @WebServlet("/CashbookListByMonthController")
 public class CashbookListByMonthController extends HttpServlet {
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		String sessionMemberId = (String)session.getAttribute("sessionMemberId");
+		if(sessionMemberId == null) {
+			// 로그인이 안된경우
+			response.sendRedirect(request.getContextPath()+"/LoginController");
+			return;
+		}
+		
+		// 디버깅
+		System.out.println("CashbookListByMonthController.doGet() sessionMemberId : " + sessionMemberId);
+		
 		// 월별 가계부 리스트 요청분석
 		Calendar now = Calendar.getInstance(); // ex) 2022.04.19
 		int year = now.get(Calendar.YEAR);
@@ -39,8 +52,8 @@ public class CashbookListByMonthController extends HttpServlet {
 		}
 		
 		// 디버깅
-		System.out.println("year : " + year);
-		System.out.println("month : " + month);
+		System.out.println("CashbookListByMonthController.doGet() year : " + year);
+		System.out.println("CashbookListByMonthController.doGet() month : " + month);
 		
 		// ----------------------------- 캘린더 구현하는 알고리즘 시작 -----------------------------
 		
@@ -77,7 +90,7 @@ public class CashbookListByMonthController extends HttpServlet {
 		
 		// 모델값(월별 가계부 리스트)을 반환하는 비지니스 로직(모델) 호출
 		CashbookDao cashbookDao = new CashbookDao(); // 메서드 사용을 위한 객체 생성
-		List<Map<String, Object>> list = cashbookDao.selectCashbookListByMonth(year, month); // 메서드 사용 후 저장
+		List<Map<String, Object>> list = cashbookDao.selectCashbookListByMonth(year, month, sessionMemberId); // 메서드 사용 후 저장
 		
 		/*
 		 달력 출력에 필요한 모델값(1), 2), 3), 4)) + 데이터베이스에서 반환된 모델값(list, year출력년도, month출력월) View쪽으로 넘기기 위해서 Map에 저장

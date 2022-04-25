@@ -12,13 +12,12 @@ import vo.Hashtag;
 
 public class CashbookDao {
 	
-	public List<Map<String, Object>> selectCashbookListByMonth(int year, int month) {
+	public List<Map<String, Object>> selectCashbookListByMonth(int year, int month, String sessionMemberId) {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		// 자원 준비
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
 		
 		try {
 			Class.forName("org.mariadb.jdbc.Driver"); // 드라이브 로딩
@@ -30,13 +29,14 @@ public class CashbookDao {
 					+ "		, cash"
 					+ "		, CONCAT(LEFT(memo, 5), '...') memo"
 					+ "   FROM cashbook"
-					+ "   WHERE YEAR(cash_date) = ? AND MONTH(cash_date) = ?"
+					+ "   WHERE YEAR(cash_date) = ? AND MONTH(cash_date) = ? AND member_id=?"
 					+ "   ORDER BY kind ASC, DAY(cash_date) ASC";
 			
 			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
 			stmt = conn.prepareStatement(sql); // 쿼리 작성
 			stmt.setInt(1, year);
 			stmt.setInt(2, month);
+			stmt.setString(3, sessionMemberId);
 			rs = stmt.executeQuery(); // 쿼리 저장
 			
 			while(rs.next()) {
@@ -75,16 +75,15 @@ public class CashbookDao {
 			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/cashbook", "root", "java1234"); // DB 접속
 			conn.setAutoCommit(false);; // 자동 커밋 해제
 			
-			String sql = "INSERT INTO cashbook"
-					+ "  (cash_date, kind, cash, memo, update_date, create_date)"
-					+ "  VALUES"
-					+ "  (?, ?, ?, ?, NOW(), NOW())";
+			String sql = "INSERT INTO cashbook (cash_date, kind, cash, memo, update_date, create_date, member_id)"
+					+ " VALUES(?, ?, ?, ?, NOW(), NOW(), ?)";
 			// insert + select 방금 생성된 행의 키값 ex) select 방금 입력한 cashbook_no from cashbook;
 			stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS); // 쿼리 작성
 			stmt.setString(1, cashbook.getCashDate());
 			stmt.setString(2, cashbook.getKind());
 			stmt.setInt(3, cashbook.getCash());
 			stmt.setString(4, cashbook.getMemo());
+			stmt.setString(5, cashbook.getMemberId());
 			stmt.executeUpdate(); // insert 실행
 			rs = stmt.getGeneratedKeys(); // select 실행 -> insert한 키값 select cashbook_no from cashbook;
 			int cashbookNo = 0;
@@ -92,11 +91,12 @@ public class CashbookDao {
 			if(rs.next()) {
 				cashbookNo = rs.getInt(1);
 			}
+			
 			// hashtag 테이블에 저장하는 코드
 			PreparedStatement stmt2 = null;
 			for(String h : hashtag) {
-				String sql2 = "INSERT INTO hashtag(cashbook_no, tag, create_date) "
-						+ " VALUES(?, ?, NOW())";
+				String sql2 = "INSERT INTO hashtag(cashbook_no, tag) "
+						+ " VALUES(?, ?)";
 				stmt2 = conn.prepareStatement(sql2);
 				stmt2.setInt(1, cashbookNo);
 				stmt2.setString(2, h);

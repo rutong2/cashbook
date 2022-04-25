@@ -70,12 +70,12 @@ public class UpdateCashbookController extends HttpServlet {
 			cashbookNo = Integer.parseInt(request.getParameter("cashbookNo"));
 		}
 		
-		String cashDate = "";
+		String cashDate = null;
 		if(request.getParameter("cashDate") != null) {
 			cashDate = request.getParameter("cashDate");
 		}
 		
-		String kind = "";
+		String kind = null;
 		if(request.getParameter("kind") != null) {
 			kind = request.getParameter("kind");
 		}
@@ -85,7 +85,7 @@ public class UpdateCashbookController extends HttpServlet {
 			cash = Integer.parseInt(request.getParameter("cash"));
 		}
 		
-		String memo = "";
+		String memo = null;
 		if(request.getParameter("memo") != null) {
 			memo = request.getParameter("memo");
 		}
